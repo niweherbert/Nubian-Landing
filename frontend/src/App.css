@@ -1,34 +1,148 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* 3D Floating Shapes Animation */
+.floating-shapes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+.shape {
+  position: absolute;
+  border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(16, 185, 129, 0.15));
+  backdrop-filter: blur(2px);
+  animation: float 20s infinite ease-in-out;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+.shape-1 {
+  width: 300px;
+  height: 300px;
+  top: 10%;
+  left: 10%;
+  animation-delay: 0s;
+  animation-duration: 25s;
+  transform: rotate(0deg);
 }
 
-.App-link {
-    color: #61dafb;
+.shape-2 {
+  width: 200px;
+  height: 200px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 3s;
+  animation-duration: 20s;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15), rgba(245, 158, 11, 0.15));
+  transform: rotate(45deg);
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+.shape-3 {
+  width: 250px;
+  height: 250px;
+  bottom: 10%;
+  left: 20%;
+  animation-delay: 6s;
+  animation-duration: 22s;
+  background: linear-gradient(135deg, rgba(251, 146, 60, 0.15), rgba(16, 185, 129, 0.15));
+  transform: rotate(90deg);
+}
+
+.shape-4 {
+  width: 180px;
+  height: 180px;
+  top: 30%;
+  right: 25%;
+  animation-delay: 9s;
+  animation-duration: 18s;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 146, 60, 0.15));
+  transform: rotate(135deg);
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+  }
+  25% {
+    transform: translate(30px, -40px) rotate(90deg) scale(1.1);
+  }
+  50% {
+    transform: translate(-20px, 30px) rotate(180deg) scale(0.9);
+  }
+  75% {
+    transform: translate(40px, 20px) rotate(270deg) scale(1.05);
+  }
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 1s ease-out;
+}
+
+/* Subtle bounce animation */
+@keyframes bounceSubtle {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 2s ease-in-out infinite;
+}
+
+/* Feature card hover effect */
+.feature-card {
+  transform: translateY(0);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-8px);
+}
+
+/* Smooth transitions for interactive elements */
+button {
+  transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+input {
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Ensure proper text alignment */
+h1, h2, h3, h4, h5, h6, p {
+  text-align: inherit;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .shape {
+    opacity: 0.5;
+  }
+  
+  .shape-1, .shape-3 {
+    width: 200px;
+    height: 200px;
+  }
+  
+  .shape-2, .shape-4 {
+    width: 150px;
+    height: 150px;
+  }
 }
