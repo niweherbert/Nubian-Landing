@@ -68,6 +68,12 @@ const webpackConfig = {
         webpackConfig.plugins.push(healthPluginInstance);
       }
 
+      webpackConfig.ignoreWarnings = [
+        (warning) =>
+          warning.message &&
+          warning.message.includes('Failed to parse source map'),
+      ];
+
       return webpackConfig;
     },
   },

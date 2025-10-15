@@ -6,7 +6,7 @@
   width: 100%;
   height: 100%;
   pointer-events: none;
-  z-index: 1;
+  z-index: 0; /* Lower than any content */
   overflow: hidden;
 }
 
@@ -54,7 +54,7 @@
   width: 180px;
   height: 180px;
   top: 30%;
-  right: 25%;
+  right: 18%;
   animation-delay: 9s;
   animation-duration: 18s;
   background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(251, 146, 60, 0.15));
@@ -363,4 +363,8 @@ h1, h2, h3, h4, h5, h6, p {
     height: auto;
     min-height: 280px;
   }
+}
+
+#emergent-badge, [href*="emergent.sh"] {
+  display: none !important;
 }

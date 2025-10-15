@@ -1,12 +1,12 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, HTTPException
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
-from typing import List
+from pydantic import BaseModel, Field, ConfigDict, EmailStr
+from typing import List, Optional
 import uuid
 from datetime import datetime, timezone
 
@@ -37,6 +37,18 @@ class StatusCheck(BaseModel):
 class StatusCheckCreate(BaseModel):
     client_name: str
 
+# Email Subscription Models
+class EmailSubscription(BaseModel):
+    model_config = ConfigDict(extra="ignore")  # Ignore MongoDB's _id field
+    
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    email: EmailStr
+    timestamp: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    status: str = Field(default="subscribed")  # subscribed, unsubscribed
+
+class EmailSubscriptionCreate(BaseModel):
+    email: EmailStr
+
 # Add your routes to the router instead of directly to app
 @api_router.get("/")
 async def root():
@@ -65,6 +77,58 @@ async def get_status_checks():
             check['timestamp'] = datetime.fromisoformat(check['timestamp'])
     
     return status_checks
+
+# Email Subscription Endpoints
+@api_router.post("/subscribe", response_model=dict)
+async def subscribe_email(input: EmailSubscriptionCreate):
+    """
+    Subscribe an email to the waitlist.
+    Returns a success message if the email is new or already subscribed.
+    """
+    email = input.email.lower()  # Normalize email to lowercase
+    
+    # Check if email already exists
+    existing = await db.email_subscriptions.find_one({"email": email}, {"_id": 0})
+    
+    if existing:
+        return {
+            "success": True,
+            "message": "You're already on the list! You'll be the first to know when we launch.",
+            "already_subscribed": True
+        }
+    
+    # Create new subscription
+    subscription = EmailSubscription(email=email)
+    
+    # Convert to dict and serialize datetime to ISO string for MongoDB
+    doc = subscription.model_dump()
+    doc['timestamp'] = doc['timestamp'].isoformat()
+    
+    await db.email_subscriptions.insert_one(doc)
+    
+    return {
+        "success": True,
+        "message": "Thank you for subscribing! You'll be the first to know when we launch.",
+        "already_subscribed": False
+    }
+
+@api_router.get("/subscribers", response_model=List[EmailSubscription])
+async def get_subscribers():
+    """
+    Get all email subscribers.
+    Returns a list of all subscribed emails with their timestamps.
+    """
+    subscribers = await db.email_subscriptions.find(
+        {"status": "subscribed"}, 
+        {"_id": 0}
+    ).to_list(10000)
+    
+    # Convert ISO string timestamps back to datetime objects
+    for subscriber in subscribers:
+        if isinstance(subscriber['timestamp'], str):
+            subscriber['timestamp'] = datetime.fromisoformat(subscriber['timestamp'])
+    
+    return subscribers
 
 # Include the router in the main app
 app.include_router(api_router)
